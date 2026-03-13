@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Camera, Edit3, LogOut, Bell, Lock, Zap, ExternalLink, CalendarCheck, MessageCircle, MessageSquare, TrendingUp } from 'lucide-react';
+import { Camera, Edit3, LogOut, Bell, Lock, Zap, ExternalLink, CalendarCheck, MessageCircle, MessageSquare, TrendingUp, Sparkles } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { STRUGGLES } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import Icon from '../components/Icon';
+import { generateDailyInsight } from '../lib/groq';
 import './ProfilePage.css';
 
 const getStruggle = (id) => STRUGGLES.find((s) => s.id === id);
@@ -16,9 +17,12 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [insight, setInsight] = useState(null);
+  const [insightLoading, setInsightLoading] = useState(true);
   const fileRef = useRef(null);
 
-  const fetchStats = useCallback(async () => {
+  const fetchStatsAndInsights = useCallback(async () => {
+    // 1. Fetch aggregate stats
     const [{ count: checkins }, { count: posts }, { count: vents }] = await Promise.all([
       supabase.from('check_ins').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
       supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
@@ -26,9 +30,19 @@ export default function ProfilePage() {
     ]);
     setStats({ checkins: checkins || 0, posts: posts || 0, vents: vents || 0 });
     setLoading(false);
+
+    // 2. Fetch recent check-ins for AI insight
+    const { data: recentCheckins } = await supabase.from('check_ins')
+      .select('*').eq('user_id', user.id).order('check_in_date', { ascending: false }).limit(14);
+    
+    if (recentCheckins && recentCheckins.length > 0) {
+      const aiInsight = await generateDailyInsight(recentCheckins);
+      setInsight(aiInsight);
+    }
+    setInsightLoading(false);
   }, [user]);
 
-  useEffect(() => { fetchStats(); }, [fetchStats]);
+  useEffect(() => { fetchStatsAndInsights(); }, [fetchStatsAndInsights]);
 
   const saveName = async () => {
     if (!newName.trim()) return;
@@ -123,6 +137,24 @@ export default function ProfilePage() {
             <span className="stat-label">{s.label}</span>
           </div>
         ))}
+      </div>
+
+      {/* AI Insights Card */}
+      <div className="profile-section-header">
+        <Sparkles size={16} style={{ color: 'var(--primary)' }} />
+        <h3>AI Insights</h3>
+      </div>
+      <div className="card-glass ai-insight-card">
+        {insightLoading ? (
+          <div className="ai-insight-loading">
+            <span className="spinner" style={{ color: 'var(--primary)', width: 14, height: 14 }} />
+            <span>Analyzing your recent check-ins...</span>
+          </div>
+        ) : insight ? (
+          <p className="ai-insight-text">{insight}</p>
+        ) : (
+          <p className="ai-insight-empty">Check in for a few days to unlock personalized AI insights about your mood patterns.</p>
+        )}
       </div>
 
       {/* Struggles */}

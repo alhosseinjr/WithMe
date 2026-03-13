@@ -11,40 +11,77 @@
   box-sizing: border-box;
 }
 
-:root {
-  /* Core palette */
-  --primary: #6366F1;
-  --primary-hover: #4F46E5;
-  --primary-muted: rgba(99, 102, 241, 0.12);
-  --primary-glow: rgba(99, 102, 241, 0.25);
-  --accent: #14B8A6;
-  --accent-muted: rgba(20, 184, 166, 0.12);
+:root, [data-theme="dark"] {
+  /* Core palette - Midnight & Peach (Premium Dark) */
+  --primary: #FB923C; /* Warm Peach */
+  --primary-hover: #F97316;
+  --primary-muted: rgba(251, 146, 60, 0.12);
+  --primary-glow: rgba(251, 146, 60, 0.35);
+  
+  --accent: #A78BFA; /* Soft Violet */
+  --accent-muted: rgba(167, 139, 250, 0.12);
 
-  /* Surfaces */
-  --bg: #0F0F14;
-  --bg-elevated: #16161E;
-  --surface: #1C1C27;
-  --surface-hover: #232333;
-  --surface-bright: #2A2A3D;
+  /* Surfaces - Very deep night-sky blue */
+  --bg: #0B0E17;
+  --bg-elevated: #111526;
+  --surface: #171B33;
+  --surface-hover: #1E2342;
+  --surface-bright: #262D53;
 
-  /* Text */
-  --text: #F0F0F5;
-  --text-secondary: #9CA3AF;
-  --text-tertiary: #6B7280;
-  --text-inverse: #0F0F14;
+  /* Text - Softer contrast for less eye strain */
+  --text: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+  --text-inverse: #000000;
 
   /* Borders */
-  --border: #2D2D3D;
-  --border-light: #3D3D50;
+  --border: #23294A;
+  --border-light: #2E3663;
 
   /* Semantic */
-  --danger: #EF4444;
-  --danger-muted: rgba(239, 68, 68, 0.12);
-  --warning: #F59E0B;
-  --success: #10B981;
-  --success-muted: rgba(16, 185, 129, 0.12);
-  --online: #22C55E;
+  --danger: #F43F5E;
+  --danger-muted: rgba(244, 63, 94, 0.12);
+  --warning: #FBBF24;
+  --success: #34D399;
+  --success-muted: rgba(52, 211, 153, 0.12);
+  --online: #34D399; /* Mint Green online dot */
+}
 
+[data-theme="light"] {
+  /* Core palette - Light (Warm Ivory & Deep Navy) */
+  --primary: #EA580C; /* Deeper Peach/Orange for contrast */
+  --primary-hover: #C2410C;
+  --primary-muted: rgba(234, 88, 12, 0.08);
+  --primary-glow: rgba(234, 88, 12, 0.2);
+  
+  --accent: #7C3AED; /* Deeper Violet */
+  --accent-muted: rgba(124, 58, 237, 0.08);
+
+  /* Surfaces - Warm Ivory to reduce eye strain */
+  --bg: #FAFAF9; /* Warm off-white */
+  --bg-elevated: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-hover: #F5F5F4;
+  --surface-bright: #E7E5E4;
+
+  /* Text - Deep Navy instead of harsh black */
+  --text: #1E1B4B;
+  --text-secondary: #4F46E5; /* Adding a subtle tint to secondary text */
+  --text-tertiary: #818CF8;
+  --text-inverse: #FFFFFF;
+
+  /* Borders */
+  --border: #E0E7FF;
+  --border-light: #C7D2FE;
+
+  /* Shadows (Light needs softer, warmer shadows) */
+  --shadow-sm: 0 1px 2px rgba(30,27,75,0.04);
+  --shadow-md: 0 4px 12px rgba(30,27,75,0.06);
+  --shadow-lg: 0 8px 32px rgba(30,27,75,0.08);
+  --shadow-glow: 0 0 40px rgba(234, 88, 12, 0.15);
+  --shadow-glow-sm: 0 0 20px rgba(234, 88, 12, 0.1);
+}
+:root {
   /* Radii */
   --r-xs: 6px;
   --r-sm: 8px;
@@ -69,6 +106,8 @@
   /* Layout */
   --sidebar-w: 260px;
   --bnav-h: 64px;
+  /* Transitions for smooth theme switching */
+  --t-color: 0.4s ease;
 }
 
 html {
@@ -83,6 +122,11 @@ body {
   color: var(--text);
   line-height: 1.5;
   min-height: 100vh;
+  transition: background-color var(--t-color), color var(--t-color);
+}
+
+*, *::before, *::after {
+  transition: background-color var(--t-color), border-color var(--t-color), box-shadow var(--t-color);
 }
 
 #root { min-height: 100vh; }
@@ -97,7 +141,7 @@ a:hover { color: var(--primary-hover); }
 /* --- Scrollbar --- */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--r-full); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: var(--r-full); }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
 
 /* --- Typography --- */
@@ -139,7 +183,7 @@ h3 { font-size: 1.125rem; }
 
 .btn-primary {
   background: var(--primary);
-  color: #fff;
+  color: var(--text-inverse);
   border-color: var(--primary);
 }
 .btn-primary:hover:not(:disabled) {
@@ -219,6 +263,7 @@ textarea.input {
   resize: vertical;
   min-height: 100px;
   line-height: 1.6;
+  background: var(--bg-elevated);
 }
 .input-label {
   display: block;
@@ -249,11 +294,14 @@ textarea.input {
 
 /* Glass cards */
 .card-glass {
-  background: rgba(28, 28, 39, 0.6);
+  background: rgba(var(--surface-rgb, 28, 28, 39), 0.6);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
   border-radius: var(--r-xl);
+}
+[data-theme="light"] .card-glass {
+  background: rgba(255, 255, 255, 0.7);
 }
 
 /* ========================================

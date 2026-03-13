@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Handshake } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 import Layout from './components/Layout';
 import WelcomePage from './pages/WelcomePage';
@@ -12,6 +13,7 @@ import CirclesPage from './pages/CirclesPage';
 import CircleDetailPage from './pages/CircleDetailPage';
 import CheckInPage from './pages/CheckInPage';
 import VentPage from './pages/VentPage';
+import CompanionPage from './pages/CompanionPage';
 import ProfilePage from './pages/ProfilePage';
 
 function AppRoutes() {
@@ -56,6 +58,7 @@ function AppRoutes() {
         <Route path="/circles/:circleId" element={<CircleDetailPage />} />
         <Route path="/checkin" element={<CheckInPage />} />
         <Route path="/vent" element={<VentPage />} />
+        <Route path="/companion" element={<CompanionPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Route>
       <Route path="*" element={<Navigate to="/circles" replace />} />
@@ -65,8 +68,10 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

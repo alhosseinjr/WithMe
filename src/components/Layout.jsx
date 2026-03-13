@@ -1,18 +1,21 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { Users, CalendarCheck, MessageCircle, User, Handshake } from 'lucide-react';
+import { Users, CalendarCheck, MessageCircle, User, Handshake, Moon, Sun, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import './Layout.css';
 
 const NAV_ITEMS = [
   { to: '/circles', icon: Users, label: 'Circles' },
   { to: '/checkin', icon: CalendarCheck, label: 'Check-in' },
   { to: '/vent', icon: MessageCircle, label: 'Vent' },
+  { to: '/companion', icon: Sparkles, label: 'AI Listener' },
   { to: '/profile', icon: User, label: 'Profile' },
 ];
 
 export default function Layout() {
   const { profile } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const initials = (profile?.display_name || 'A')
     .split(' ')
     .map((w) => w[0])
@@ -50,6 +53,11 @@ export default function Layout() {
         </nav>
 
         <div className="sidebar-footer">
+          <button className="sidebar-link" onClick={toggleTheme} style={{ marginBottom: 16, background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}>
+            {theme === 'dark' ? <Sun size={18} className="link-icon" /> : <Moon size={18} className="link-icon" />}
+            <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+          </button>
+          
           <div className="sidebar-user">
             <div className="avatar avatar-sm">
               {avatarUrl ? (

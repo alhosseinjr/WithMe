@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, X, Shield, MessageCircle } from 'lucide-react';
+import { Plus, X, Shield, MessageCircle, Sparkles } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { REACTIONS } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import Icon from '../components/Icon';
 import { formatDistanceToNow } from 'date-fns';
+import { generateEmpathyReply } from '../lib/groq';
 import './VentPage.css';
 
 export default function VentPage() {
@@ -14,6 +15,8 @@ export default function VentPage() {
   const [showCompose, setShowCompose] = useState(false);
   const [ventText, setVentText] = useState('');
   const [posting, setPosting] = useState(false);
+  const [aiReplies, setAiReplies] = useState({});
+  const [aiLoading, setAiLoading] = useState({});
 
   const fetchPosts = useCallback(async () => {
     const { data } = await supabase.from('vents').select('*, vent_reactions(reaction_type, user_id)').order('created_at', { ascending: false }).limit(50);
@@ -40,6 +43,14 @@ export default function VentPage() {
       await supabase.from('vent_reactions').insert({ vent_id: ventId, user_id: user.id, reaction_type: reactionType });
     }
     fetchPosts();
+  };
+
+  const handleAiSupport = async (ventId, content) => {
+    if (aiReplies[ventId] || aiLoading[ventId]) return;
+    setAiLoading(prev => ({ ...prev, [ventId]: true }));
+    const reply = await generateEmpathyReply(content);
+    setAiReplies(prev => ({ ...prev, [ventId]: reply }));
+    setAiLoading(prev => ({ ...prev, [ventId]: false }));
   };
 
   return (
@@ -95,7 +106,31 @@ export default function VentPage() {
                       </button>
                     );
                   })}
+                  <button 
+                    className={`reaction-chip ${aiReplies[item.id] ? 'active' : ''}`} 
+                    onClick={() => handleAiSupport(item.id, item.content)}
+                    disabled={!!aiReplies[item.id]}
+                    style={aiReplies[item.id] ? { background: 'var(--primary-muted)', borderColor: 'var(--primary-glow)', color: 'var(--primary)' } : {}}
+                  >
+                    {aiLoading[item.id] ? (
+                      <span className="spinner" style={{ width: 13, height: 13 }} />
+                    ) : (
+                      <>
+                        <Sparkles size={13} style={{ color: aiReplies[item.id] ? 'var(--primary)' : 'inherit' }} />
+                        <span className="reaction-label-text">AI Support</span>
+                      </>
+                    )}
+                  </button>
                 </div>
+                {aiReplies[item.id] && (
+                  <div className="vent-ai-reply fade-in">
+                    <div className="vent-ai-reply-header">
+                      <Sparkles size={12} />
+                      <span>AI Compassion (Private to you)</span>
+                    </div>
+                    <p>{aiReplies[item.id]}</p>
+                  </div>
+                )}
               </div>
             );
           })}
