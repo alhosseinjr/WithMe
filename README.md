@@ -4,113 +4,93 @@
   <p><strong>A safe, anonymous peer support community for people going through hard times.</strong></p>
   
   <p>
+    <a href="https://with-me-app.vercel.app/"><strong>🔴 Live Demo</strong></a> •
     <a href="#features">Features</a> •
     <a href="#tech-stack">Tech Stack</a> •
-    <a href="#getting-started">Getting Started</a> •
-    <a href="#deployment">Deployment</a>
+    <a href="#local-development">Local Development</a>
   </p>
 </div>
 
 ---
 
-## 🌟 About WithMe
+## 🌟 About The Project
 
-WithMe is a premium, modern web application designed to help people connect over shared struggles. It's not about advice or therapy—it's about the profound relief of knowing **you are not alone**. 
+WithMe is a premium, modern web application designed to help people connect over shared struggles. It's built on the premise that sometimes the most profound relief comes simply from knowing **you are not alone**. 
 
-With a beautiful dark-glassmorphism UI, real-time chats, voice/video call integration, and complete anonymity, WithMe provides a safe haven for authentic human connection.
+Unlike traditional social media, WithMe strips away performance and advice in favor of pure empathy. With a beautiful dark-glassmorphism UI, real-time presence, and complete anonymity, it provides a safe haven for authentic human connection.
+
+**Live Deployment:** [with-me-app.vercel.app](https://with-me-app.vercel.app/)
 
 ---
 
-## ✨ Premium Features
+## ✨ Features
 
-- 🎭 **100% Anonymous Venting** — A judgment-free space to let it out. Shield avatars protect your identity.
-- 🤝 **Support Circles** — Dedicated groups for Anxiety, Grief, Burnout, Loneliness, and more.
+- 🎭 **100% Anonymous Venting** — A judgment-free global space to let it out. Shield avatars protect identity.
+- 🤝 **Support Circles** — Dedicated group feeds for Anxiety, Grief, Burnout, Loneliness, and more.
 - 💬 **Real-time Chat & Reactions** — Fluid, instant messaging with supportive micro-interactions ("I hear you", "Sending warmth").
-- 📎 **File Attachments** — Share images and documents directly within your Circles.
-- 📞 **Voice & Video Ready** — Built-in UI to start instant calls with your support group.
-- 🟢 **Live Presence indicators** — See how many members are actively online right now.
-- 📅 **Daily Check-ins** — Track your mood and build healthy habits over time.
-- 👤 **Customizable Profiles** — Upload an avatar, track your journey stats, and manage your privacy.
-- 🎨 **World-class Design** — A breathtaking dark theme with glassmorphism, gradient glows, and butter-smooth micro-animations.
+- 📎 **File Attachments** — Users can share images and documents directly within their Circles.
+- 📞 **Voice & Video Ready** — Built-in UI to start instant real-time calls with the support group.
+- 🟢 **Live Presence indicators** — Displays how many circle members are actively online.
+- 📅 **Daily Check-ins** — Users can track their mood and build healthy habits over time.
+- 👤 **Customizable Profiles** — Secure photo uploads (via Supabase Storage), journey stats tracking, and privacy controls.
+- 🎨 **World-class Design** — A breathtaking dark UI featuring glassmorphism, responsive bottom-nav routing for mobile, and butter-smooth micro-animations.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Architecture & Tech Stack
 
-WithMe is built for speed, security, and scalability.
+WithMe was architected for speed, security, and scalability using modern web technologies.
 
-- **Frontend Framework:** React 18 + Vite
-- **Routing:** React Router v6
-- **Styling:** Vanilla CSS with custom properties & glassmorphism
-- **Icons:** Lucide React
-- **Backend & Database:** Supabase (PostgreSQL)
-- **Authentication:** Supabase Auth (Email/Password)
-- **File Storage:** Supabase Storage
-- **Real-time:** Supabase Channels & Subscriptions
+**Frontend:**
+* **React 18 + Vite** for a lightning-fast development environment and optimized production builds.
+* **React Router v6** for seamless, declarative client-side routing.
+* **Vanilla CSS (Custom Properties)** for a lightweight, deeply customized design system without UI framework bloat.
+* **Lucide React** for crisp, scalable SVG iconography.
+
+**Backend & Database (Supabase):**
+* **PostgreSQL Database** — Complex relational data modeling across Users, Circles, Posts, Reactions, and Check-ins.
+* **Supabase Auth** — Secure email/password authentication with protected client routing.
+* **Supabase Storage** — Scalable cloud storage for user avatars and chat file attachments.
+* **Real-time Subscriptions** — Websocket integrations for live chat and instant reaction updates.
+* **Row Level Security (RLS)** — Granular database-level security ensuring users can only read/write authorized data.
 
 ---
 
-## 🚀 Getting Started (Local Development)
+## 🚀 Local Development
 
-### 1. Prerequisites
-- Node.js (v18 or newer)
-- A free [Supabase](https://supabase.com) account
+Want to run this project locally? Follow these steps:
 
-### 2. Clone the repository
+### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/withme.git
+git clone https://github.com/alhosseinjr/withme.git
 cd withme
 ```
 
-### 3. Install dependencies
+### 2. Install dependencies
 ```bash
 npm install
 ```
 
-### 4. Setup Supabase Database
-1. Create a new project in [Supabase](https://supabase.com).
+### 3. Setup Supabase
+1. Create a free project in [Supabase](https://supabase.com).
 2. Go to the **SQL Editor** in your Supabase dashboard.
-3. Copy the contents of `SUPABASE_SETUP.sql` from this repository and run it. This creates all tables, Row Level Security (RLS) policies, and seed data.
+3. Run the contents of `SUPABASE_SETUP.sql` from this repository. This executes the schema creation, RLS policies, triggers, and seed data.
+4. Go to **Storage** and create two public buckets: `avatars` and `attachments`.
 
-### 5. Setup Environment Variables
-Connect the app to your database. Open `src/lib/supabase.js` and add your project URL and anon public key:
+### 4. Setup Environment Variables
+Connect the app to your database. In a production environment, use a `.env` file. For immediate local testing, update `src/lib/supabase.js`:
 ```js
 const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
 const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
 ```
-*(For production, these should be moved to a `.env` file!)*
 
-### 6. Run the app
+### 5. Run the dev server
 ```bash
 npm run dev
 ```
 Open **http://localhost:5173** to see the app!
 
 ---
-
-## 🌍 Launching to the World (Deployment)
-
-To launch WithMe to the public, we recommend deploying the frontend on **Vercel** or **Netlify**, while keeping the backend on Supabase.
-
-### Deploying to Vercel (Easiest)
-
-1. Connect your GitHub repository to [Vercel](https://vercel.com/new).
-2. Vercel will automatically detect that it's a Vite + React project.
-3. Add any necessary Environment Variables (if using `.env`).
-4. Click **Deploy**. In less than 2 minutes, your app will be live globally!
-
-### Supabase Production Readiness
-- Ensure your Row Level Security (RLS) policies are active (already handled in `SUPABASE_SETUP.sql`).
-- Set up Supabase Storage buckets:
-  - Create a public bucket named `avatars`
-  - Create a public bucket named `attachments`
-
----
-
-## 🛡️ Privacy & Safety
-WithMe prioritizes user safety. It uses strict PostgreSQL Row Level Security to ensure users can only modify their own data, while maintaining the anonymity required for a vulnerable support space.
-
----
 <div align="center">
-  <p>Built with ❤️ for those who need a safe space.</p>
+  <p>Built by <a href="https://github.com/alhosseinjr">alhosseinjr</a></p>
 </div>
