@@ -12,74 +12,74 @@
 }
 
 :root, [data-theme="dark"] {
-  /* Core palette - Graphite & Emerald (Premium Dark) */
-  --primary: #34D399; /* Smooth Emerald */
-  --primary-hover: #10B981;
-  --primary-muted: rgba(52, 211, 153, 0.12);
-  --primary-glow: rgba(52, 211, 153, 0.35);
+  /* Core palette - Forest & Sage (Custom Premium) */
+  --primary: #8EB69B; /* Soft Sage */
+  --primary-hover: #DAF1DE;
+  --primary-muted: rgba(142, 182, 155, 0.15);
+  --primary-glow: rgba(142, 182, 155, 0.35);
   
-  --accent: #FBBF24; /* Muted Gold/Amber */
-  --accent-muted: rgba(251, 191, 36, 0.12);
+  --accent: #235347; /* Forest Green */
+  --accent-muted: rgba(35, 83, 71, 0.2);
 
-  /* Surfaces - Pure sleek graphite/blacks (NO BLUE) */
-  --bg: #000000;
-  --bg-elevated: #09090B;
-  --surface: #141414;
-  --surface-hover: #1E1E1E;
-  --surface-bright: #262626;
+  /* Surfaces - Deep Forest Greens (From Image) */
+  --bg: #051F20;
+  --bg-elevated: #0B2B26;
+  --surface: #163832;
+  --surface-hover: #235347;
+  --surface-bright: #316E5A;
 
-  /* Text - Crisp and high contrast */
-  --text: #F8FAFC;
-  --text-secondary: #A1A1AA;
-  --text-tertiary: #71717A;
-  --text-inverse: #000000;
+  /* Text - Pale Mint / Off-White */
+  --text: #DAF1DE;
+  --text-secondary: rgba(218, 241, 222, 0.7);
+  --text-tertiary: rgba(218, 241, 222, 0.5);
+  --text-inverse: #051F20;
 
   /* Borders */
-  --border: #262626;
-  --border-light: #3F3F46;
+  --border: #235347;
+  --border-light: #316E5A;
 
   /* Semantic */
   --danger: #EF4444;
   --danger-muted: rgba(239, 68, 68, 0.12);
   --warning: #F59E0B;
-  --success: #10B981;
-  --success-muted: rgba(16, 185, 129, 0.12);
-  --online: #34D399;
+  --success: #8EB69B;
+  --success-muted: rgba(142, 182, 155, 0.12);
+  --online: #8EB69B;
 }
 
 [data-theme="light"] {
-  /* Core palette - Light (Ultra-clean White & Emerald) */
-  --primary: #10B981; /* Deeper Emerald for contrast */
-  --primary-hover: #059669;
-  --primary-muted: rgba(16, 185, 129, 0.08);
-  --primary-glow: rgba(16, 185, 129, 0.2);
+  /* Core palette - Light (Pale Mint & Deep Forest) */
+  --primary: #163832; /* Dark Sage */
+  --primary-hover: #0B2B26;
+  --primary-muted: rgba(22, 56, 50, 0.08);
+  --primary-glow: rgba(22, 56, 50, 0.2);
   
-  --accent: #D97706; /* Amber */
-  --accent-muted: rgba(217, 119, 6, 0.08);
+  --accent: #235347; /* Forest Green */
+  --accent-muted: rgba(35, 83, 71, 0.08);
 
-  /* Surfaces - Clean whites and ultra-light grays */
-  --bg: #FAFAFA;
+  /* Surfaces - Pale Mint */
+  --bg: #DAF1DE; /* Very pale mint from image */
   --bg-elevated: #FFFFFF;
   --surface: #FFFFFF;
-  --surface-hover: #F4F4F5;
-  --surface-bright: #E4E4E7;
+  --surface-hover: rgba(142, 182, 155, 0.15); /* Soft sage tint */
+  --surface-bright: #8EB69B;
 
-  /* Text - Deep Charcoal instead of harsh black */
-  --text: #18181B;
-  --text-secondary: #52525B;
-  --text-tertiary: #A1A1AA;
+  /* Text - Deepest Forest Green instead of black */
+  --text: #051F20;
+  --text-secondary: #0B2B26;
+  --text-tertiary: #163832;
   --text-inverse: #FFFFFF;
 
   /* Borders */
-  --border: #E4E4E7;
-  --border-light: #D4D4D8;
+  --border: rgba(142, 182, 155, 0.4);
+  --border-light: rgba(142, 182, 155, 0.8);
 
-  /* Shadows (Light needs softer, pristine shadows) */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.03);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.08);
-  --shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
-  --shadow-glow-sm: 0 0 20px rgba(16, 185, 129, 0.1);
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(5, 31, 32, 0.05);
+  --shadow-md: 0 4px 12px rgba(5, 31, 32, 0.08);
+  --shadow-lg: 0 8px 32px rgba(5, 31, 32, 0.1);
+  --shadow-glow: 0 0 40px rgba(22, 56, 50, 0.15);
+  --shadow-glow-sm: 0 0 20px rgba(22, 56, 50, 0.1);
 }
 :root {
   /* Radii */
