@@ -26,8 +26,14 @@ export default function Layout() {
   const avatarUrl = profile?.avatar_url;
 
   return (
-    <div className="app-layout">
-      {/* Sidebar */}
+    <>
+      <div className="animated-bg-container">
+        <div className="bg-orb bg-orb-1"></div>
+        <div className="bg-orb bg-orb-2"></div>
+        <div className="bg-orb bg-orb-3"></div>
+      </div>
+      <div className="app-layout">
+        {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-brand">
           <div className="brand-mark">
@@ -98,5 +104,6 @@ export default function Layout() {
         </div>
       </nav>
     </div>
+    </>
   );
 }
