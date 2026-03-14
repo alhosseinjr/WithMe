@@ -155,18 +155,20 @@ export default function CircleDetailPage() {
         </div>
       </div>
 
-      {/* Call UI overlay */}
+      {/* Call UI overlay using Jitsi Meet for instant, working WebRTC calls */}
       {showCallUI && (
         <div className="call-overlay">
-          <div className="call-content card-glass fade-in">
-            <Phone size={32} className="call-icon-pulse" />
-            <h3>Start a call?</h3>
-            <p className="call-desc">Voice and video calls connect you in real-time with circle members.</p>
-            <div className="call-actions">
-              <button className="btn btn-primary btn-lg"><Phone size={16} /> Voice call</button>
-              <button className="btn btn-secondary btn-lg"><Video size={16} /> Video call</button>
+          <div className="call-content card-glass fade-in" style={{ width: '90%', maxWidth: '800px', padding: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--surface-hover)', borderBottom: '1px solid var(--border)' }}>
+               <h3 style={{ margin: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text)' }}><Video size={16} style={{ color: 'var(--primary)' }} /> Live Circle Room</h3>
+               <button className="btn-ghost" style={{ padding: 4 }} onClick={() => setShowCallUI(false)} title="Leave Call"><X size={18} /></button>
             </div>
-            <button className="btn btn-ghost" onClick={() => setShowCallUI(false)}>Cancel</button>
+            <iframe 
+              allow="camera; microphone; fullscreen; display-capture; autoplay" 
+              src={`https://meet.jit.si/WithMe_App_Circle_${circleId}`} 
+              style={{ width: '100%', height: '500px', border: 'none', display: 'block', background: '#000' }}
+              title="Jitsi Video Call"
+            ></iframe>
           </div>
         </div>
       )}
