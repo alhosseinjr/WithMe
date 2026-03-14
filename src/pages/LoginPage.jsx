@@ -21,8 +21,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container fade-in">
+    <>
+      {/* Premium Animated Background */}
+      <div className="animated-bg-container">
+        <div className="bg-orb bg-orb-1"></div>
+        <div className="bg-orb bg-orb-2"></div>
+        <div className="bg-orb bg-orb-3"></div>
+      </div>
+      <div className="auth-page">
+        <div className="auth-container fade-in card-glass" style={{ padding: '40px 32px' }}>
         <Link to="/" className="auth-back"><ArrowLeft size={16} /> Back</Link>
         <h1 className="auth-title">Welcome back</h1>
         <p className="auth-subtitle">We're glad you're here.</p>
@@ -43,5 +50,6 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+    </>
   );
 }

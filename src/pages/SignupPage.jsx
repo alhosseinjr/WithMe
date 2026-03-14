@@ -34,8 +34,15 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container fade-in">
+    <>
+      {/* Premium Animated Background */}
+      <div className="animated-bg-container">
+        <div className="bg-orb bg-orb-1"></div>
+        <div className="bg-orb bg-orb-2"></div>
+        <div className="bg-orb bg-orb-3"></div>
+      </div>
+      <div className="auth-page">
+        <div className="auth-container fade-in card-glass" style={{ padding: '40px 32px' }}>
         <Link to="/" className="auth-back"><ArrowLeft size={16} /> Back</Link>
         <h1 className="auth-title">Create your account</h1>
         <p className="auth-subtitle">Free forever for the essentials.</p>
@@ -60,5 +67,6 @@ export default function SignupPage() {
         </form>
       </div>
     </div>
+    </>
   );
 }

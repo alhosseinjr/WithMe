@@ -1,127 +1,143 @@
+/* ========================================
+   LANDING PAGE (WelcomePage)
+   ======================================== */
 .welcome-page {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  position: relative;
-  overflow: hidden;
-}
-
-.welcome-glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  pointer-events: none;
-}
-.glow-1 {
-  width: 500px; height: 500px;
-  background: rgba(99, 102, 241, 0.15);
-  top: -150px; right: -200px;
-}
-.glow-2 {
-  width: 400px; height: 400px;
-  background: rgba(20, 184, 166, 0.1);
-  bottom: -100px; left: -150px;
-}
-
-.welcome-container {
-  max-width: 480px;
-  width: 100%;
-  text-align: center;
+  flex-direction: column;
   position: relative;
   z-index: 1;
 }
 
-.welcome-hero { margin-bottom: 28px; }
+/* Nav */
+.welcome-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 5%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+  background: rgba(var(--bg-elevated-rgb, 255,255,255), 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+[data-theme="dark"] .welcome-nav {
+  background: rgba(11, 43, 38, 0.6);
+}
 
-.hero-brand-mark {
-  width: 72px; height: 72px;
-  border-radius: var(--r-xl);
-  background: linear-gradient(135deg, var(--primary), #8B5CF6);
-  display: inline-flex;
+.welcome-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.welcome-nav-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Hero */
+.welcome-hero-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow-glow);
+  text-align: center;
+  padding: 100px 20px 80px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  display: inline-flex;
+  gap: 8px;
+  box-shadow: var(--shadow-glow-sm);
 }
 
 .hero-title {
-  font-size: 3rem;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
   font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 24px;
   letter-spacing: -0.04em;
-  background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
+  color: var(--text);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 10px;
 }
 
 .hero-tagline {
-  font-size: 1.0625rem;
+  font-size: clamp(1.125rem, 2vw, 1.35rem);
   color: var(--text-secondary);
-  line-height: 1.5;
+  max-width: 650px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
-.welcome-tags {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 32px;
+/* Features */
+.welcome-features-section {
+  padding: 60px 5%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.welcome-features {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 36px;
-  text-align: left;
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
 }
 
 .feature-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
+  padding: 32px;
+  text-align: left;
+  gap: 12px;
 }
 
 .feature-icon-wrap {
-  width: 40px; height: 40px;
+  width: 52px;
+  height: 52px;
   border-radius: var(--r-md);
-  background: var(--primary-muted);
-  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  margin-bottom: 12px;
 }
 
 .feature-title {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 1.125rem;
+  font-weight: 700;
   color: var(--text);
-  margin-bottom: 2px;
+  margin-bottom: 8px;
 }
 
 .feature-desc {
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.welcome-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.welcome-btn { width: 100%; justify-content: center; }
-
-.welcome-disclaimer {
-  font-size: 0.6875rem;
-  color: var(--text-tertiary);
-  margin-top: 16px;
   line-height: 1.5;
+}
+
+/* Footer */
+.welcome-footer {
+  padding: 32px 20px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  margin-top: auto;
+  border-top: 1px solid var(--border);
 }

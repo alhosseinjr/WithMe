@@ -36,7 +36,8 @@ export default function CircleDetailPage() {
   const [attachment, setAttachment] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [showCallUI, setShowCallUI] = useState(false);
-  const [onlineCount] = useState(Math.floor(Math.random() * 8) + 1);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [showMembersModal, setShowMembersModal] = useState(false);
   const [isMember, setIsMember] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -57,12 +58,31 @@ export default function CircleDetailPage() {
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [posts]);
 
   useEffect(() => {
-    const channel = supabase.channel(`circle-${circleId}`)
+    if (!profile) return;
+    const channel = supabase.channel(`circle-${circleId}`, { 
+      config: { presence: { key: user.id } } 
+    });
+
+    channel
       .on('postgres_changes', { event: '*', schema: 'public', table: 'posts', filter: `circle_id=eq.${circleId}` }, fetchData)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'post_reactions' }, fetchData)
-      .subscribe();
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const users = Object.values(state).flat().map(p => p.profile);
+        // Only keep unique users by ID in case of multiple tabs
+        const unique = Array.from(new Map(users.map(item => [item.id, item])).values());
+        setOnlineUsers(unique);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({ 
+            profile: { id: user.id, display_name: profile.display_name, avatar_url: profile.avatar_url }
+          });
+        }
+      });
+
     return () => supabase.removeChannel(channel);
-  }, [circleId, fetchData]);
+  }, [circleId, fetchData, user.id, profile]);
 
   const handleJoin = async () => {
     await supabase.from('circle_members').insert({ circle_id: circleId, user_id: user.id });
@@ -160,9 +180,9 @@ export default function CircleDetailPage() {
               alert('Circle ID copied to clipboard: ' + circle.id);
             }}>Share ID</button>
           )}
-          <div className="online-bar">
+          <div className="online-bar" onClick={() => setShowMembersModal(true)} style={{ cursor: 'pointer', transition: 'all 0.2s ease' }} title="View online members">
             <span className="online-dot" />
-            <span>{onlineCount} online</span>
+            <span style={{ fontWeight: 600 }}>{onlineUsers.length} online</span>
           </div>
           {isMember && (
             <>
@@ -203,6 +223,32 @@ export default function CircleDetailPage() {
         </div>
       ) : (
         <>
+          {showMembersModal && (
+            <div className="modal-overlay">
+              <div className="modal-content fade-in card-glass">
+                <button className="modal-close" onClick={() => setShowMembersModal(false)}><X size={20} /></button>
+                <h2 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Users size={20} color="var(--primary)" /> Circle Members
+                </h2>
+                <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '400px', overflowY: 'auto' }}>
+                  {onlineUsers.map(u => (
+                    <div key={u.id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'var(--surface-hover)', borderRadius: 'var(--r-md)' }}>
+                      <div className="avatar avatar-sm">
+                        {u.avatar_url ? <img src={u.avatar_url} alt="" /> : (u.display_name || 'A')[0].toUpperCase()}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontWeight: 600, color: 'var(--text)' }}>{u.display_name || 'Anonymous'}</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span className="online-dot" style={{ width: 6, height: 6 }} /> Active now
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="cd-messages">
         {posts.length === 0 ? (
           <div className="empty-state">
