@@ -105,7 +105,7 @@ create policy "Public read members" on circle_members for select using (true);
 
 -- Posts are only readable if the circle is public OR the user is a member
 create policy "Read posts" on posts for select using (
-  exists (select 1 from circles where id = circle_id and is_private = false) or
+  exists (select 1 from circles where id = circle_id and is_private is not true) or
   exists (select 1 from circle_members where circle_id = posts.circle_id and user_id = auth.uid())
 );
 

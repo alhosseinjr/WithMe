@@ -19,7 +19,7 @@ export default function CirclesPage() {
   const [search, setSearch] = useState('');
 
   const fetchCircles = useCallback(async () => {
-    const { data: allCircles } = await supabase.from('circles').select('*, circle_members(count)').eq('is_private', false).order('created_at', { ascending: false });
+    const { data: allCircles } = await supabase.from('circles').select('*, circle_members(count)').or('is_private.eq.false,is_private.is.null').order('created_at', { ascending: false });
     const { data: memberships } = await supabase.from('circle_members').select('circle_id').eq('user_id', user.id);
     const myIds = (memberships || []).map((m) => m.circle_id);
     setMyCircles(myIds);
