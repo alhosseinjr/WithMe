@@ -110,28 +110,54 @@ alter table vent_reactions enable row level security;
 alter table ai_messages enable row level security;
 
 -- Public read policies
+drop policy if exists "Public read circles" on circles;
 create policy "Public read circles" on circles for select using (true);
+
+drop policy if exists "Public read members" on circle_members;
 create policy "Public read members" on circle_members for select using (true);
 
 -- Posts are only readable if the circle is public OR the user is a member
+drop policy if exists "Read posts" on posts;
 create policy "Read posts" on posts for select using (
   exists (select 1 from circles where id = circle_id and is_private is not true) or
   exists (select 1 from circle_members where circle_id = posts.circle_id and user_id = auth.uid())
 );
 
+drop policy if exists "Public read post_reactions" on post_reactions;
 create policy "Public read post_reactions" on post_reactions for select using (true);
+
+drop policy if exists "Public read checkins" on check_ins;
 create policy "Public read checkins" on check_ins for select using (true);
+
+drop policy if exists "Public read vents" on vents;
 create policy "Public read vents" on vents for select using (true);
+
+drop policy if exists "Public read vent_reactions" on vent_reactions;
 create policy "Public read vent_reactions" on vent_reactions for select using (true);
 
 -- Authenticated write policies
+drop policy if exists "Own profile" on profiles;
 create policy "Own profile" on profiles for all using (auth.uid() = id);
+
+drop policy if exists "Join circles" on circle_members;
 create policy "Join circles" on circle_members for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Post in circles" on posts;
 create policy "Post in circles" on posts for insert with check (auth.uid() = user_id);
+
+drop policy if exists "React to posts" on post_reactions;
 create policy "React to posts" on post_reactions for all using (auth.uid() = user_id);
+
+drop policy if exists "Check in" on check_ins;
 create policy "Check in" on check_ins for all using (auth.uid() = user_id);
+
+drop policy if exists "Create vent" on vents;
 create policy "Create vent" on vents for insert with check (auth.uid() = user_id);
+
+drop policy if exists "React to vents" on vent_reactions;
 create policy "React to vents" on vent_reactions for all using (auth.uid() = user_id);
+
+drop policy if exists "Manage own AI messages" on ai_messages;
 create policy "Manage own AI messages" on ai_messages for all using (auth.uid() = user_id);
 
 -- Auto-create profile on signup
