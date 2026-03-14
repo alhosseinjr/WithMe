@@ -19,6 +19,8 @@ create table if not exists circles (
   name text not null,
   description text,
   struggle_type text,
+  is_private boolean default false,
+  created_by uuid references profiles(id),
   created_at timestamptz default now()
 );
 
@@ -96,7 +98,13 @@ alter table vent_reactions enable row level security;
 -- Public read policies
 create policy "Public read circles" on circles for select using (true);
 create policy "Public read members" on circle_members for select using (true);
-create policy "Public read posts" on posts for select using (true);
+
+-- Posts are only readable if the circle is public OR the user is a member
+create policy "Read posts" on posts for select using (
+  exists (select 1 from circles where id = circle_id and is_private = false) or
+  exists (select 1 from circle_members where circle_id = posts.circle_id and user_id = auth.uid())
+);
+
 create policy "Public read post_reactions" on post_reactions for select using (true);
 create policy "Public read checkins" on check_ins for select using (true);
 create policy "Public read vents" on vents for select using (true);
@@ -130,15 +138,15 @@ create or replace trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 -- ============================================
--- Seed starter circles
+-- Seed starter circles (Public)
 -- ============================================
-insert into circles (name, description, struggle_type) values
-  ('Anxiety Support', 'A safe space for people dealing with anxiety, panic, and overthinking. You are not alone.', 'anxiety'),
-  ('Grief & Loss', 'For those navigating loss in all its forms — a person, a relationship, a dream.', 'grief'),
-  ('Burnout Recovery', 'You gave too much for too long. Let''s find our way back together.', 'burnout'),
-  ('Loneliness & Connection', 'For anyone who feels invisible or disconnected from the world.', 'loneliness'),
-  ('Low Mood', 'No pressure. No performance. Just presence and understanding.', 'depression'),
-  ('Relationship Pain', 'Heartbreak, conflict, trust issues — all of it is welcome here.', 'relationships'),
-  ('Health Anxiety', 'For those whose minds go to the worst-case health scenarios.', 'health'),
-  ('Big Life Changes', 'Job loss, moving, divorce, transitions — change is hard. We get it.', 'life_change')
+insert into circles (name, description, struggle_type, is_private) values
+  ('Anxiety Support', 'A safe space for people dealing with anxiety, panic, and overthinking. You are not alone.', 'anxiety', false),
+  ('Grief & Loss', 'For those navigating loss in all its forms — a person, a relationship, a dream.', 'grief', false),
+  ('Burnout Recovery', 'You gave too much for too long. Let''s find our way back together.', 'burnout', false),
+  ('Loneliness & Connection', 'For anyone who feels invisible or disconnected from the world.', 'loneliness', false),
+  ('Low Mood', 'No pressure. No performance. Just presence and understanding.', 'depression', false),
+  ('Relationship Pain', 'Heartbreak, conflict, trust issues — all of it is welcome here.', 'relationships', false),
+  ('Health Anxiety', 'For those whose minds go to the worst-case health scenarios.', 'health', false),
+  ('Big Life Changes', 'Job loss, moving, divorce, transitions — change is hard. We get it.', 'life_change', false)
 on conflict do nothing;

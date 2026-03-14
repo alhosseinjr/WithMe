@@ -37,18 +37,21 @@ export default function CircleDetailPage() {
   const [uploading, setUploading] = useState(false);
   const [showCallUI, setShowCallUI] = useState(false);
   const [onlineCount] = useState(Math.floor(Math.random() * 8) + 1);
+  const [isMember, setIsMember] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const fetchData = useCallback(async () => {
-    const [{ data: circleData }, { data: postsData }] = await Promise.all([
+    const [{ data: circleData }, { data: memberData }, { data: postsData }] = await Promise.all([
       supabase.from('circles').select('*').eq('id', circleId).single(),
+      supabase.from('circle_members').select('id').eq('circle_id', circleId).eq('user_id', user.id).maybeSingle(),
       supabase.from('posts').select('*, post_reactions(reaction_type, user_id)').eq('circle_id', circleId).order('created_at', { ascending: true }),
     ]);
     setCircle(circleData);
+    setIsMember(!!memberData);
     setPosts(postsData || []);
     setLoading(false);
-  }, [circleId]);
+  }, [circleId, user]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [posts]);
@@ -60,6 +63,11 @@ export default function CircleDetailPage() {
       .subscribe();
     return () => supabase.removeChannel(channel);
   }, [circleId, fetchData]);
+
+  const handleJoin = async () => {
+    await supabase.from('circle_members').insert({ circle_id: circleId, user_id: user.id });
+    fetchData();
+  };
 
   const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
@@ -146,12 +154,22 @@ export default function CircleDetailPage() {
           </div>
         </div>
         <div className="cd-header-actions">
+          {circle?.is_private && isMember && (
+            <button className="btn btn-secondary btn-sm" onClick={() => {
+              navigator.clipboard.writeText(circle.id);
+              alert('Circle ID copied to clipboard: ' + circle.id);
+            }}>Share ID</button>
+          )}
           <div className="online-bar">
             <span className="online-dot" />
             <span>{onlineCount} online</span>
           </div>
-          <button className="btn-icon" title="Voice call" onClick={() => setShowCallUI(true)}><Phone size={16} /></button>
-          <button className="btn-icon" title="Video call" onClick={() => setShowCallUI(true)}><Video size={16} /></button>
+          {isMember && (
+            <>
+              <button className="btn-icon" title="Voice call" onClick={() => setShowCallUI(true)}><Phone size={16} /></button>
+              <button className="btn-icon" title="Video call" onClick={() => setShowCallUI(true)}><Video size={16} /></button>
+            </>
+          )}
         </div>
       </div>
 
@@ -173,8 +191,19 @@ export default function CircleDetailPage() {
         </div>
       )}
 
-      {/* Messages */}
-      <div className="cd-messages">
+      {/* Messages / Join Gate */}
+      {!isMember ? (
+        <div className="cd-messages" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="empty-state card-glass" style={{ padding: '40px', maxWidth: '400px' }}>
+            <Users className="empty-icon" />
+            <div className="empty-title">You haven't joined this circle</div>
+            <div className="empty-desc">Join to see conversations, connect on video calls, and share your thoughts.</div>
+            <button className="btn btn-primary" style={{ marginTop: 24, width: '100%' }} onClick={handleJoin}>Join Circle</button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="cd-messages">
         {posts.length === 0 ? (
           <div className="empty-state">
             <Users className="empty-icon" />
@@ -246,6 +275,8 @@ export default function CircleDetailPage() {
           </button>
         </form>
       </div>
+        </>
+      )}
     </div>
   );
 }

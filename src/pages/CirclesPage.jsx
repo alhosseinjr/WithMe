@@ -19,7 +19,7 @@ export default function CirclesPage() {
   const [search, setSearch] = useState('');
 
   const fetchCircles = useCallback(async () => {
-    const { data: allCircles } = await supabase.from('circles').select('*, circle_members(count)').order('created_at', { ascending: false });
+    const { data: allCircles } = await supabase.from('circles').select('*, circle_members(count)').eq('is_private', false).order('created_at', { ascending: false });
     const { data: memberships } = await supabase.from('circle_members').select('circle_id').eq('user_id', user.id);
     const myIds = (memberships || []).map((m) => m.circle_id);
     setMyCircles(myIds);
@@ -29,23 +29,49 @@ export default function CirclesPage() {
 
   useEffect(() => { fetchCircles(); }, [fetchCircles]);
 
-  const joinCircle = async (circleId) => {
-    if (myCircles.includes(circleId)) { navigate(`/circles/${circleId}`); return; }
-    await supabase.from('circle_members').insert({ circle_id: circleId, user_id: user.id });
-    setMyCircles((prev) => [...prev, circleId]);
+  const goToCircle = (circleId) => {
     navigate(`/circles/${circleId}`);
   };
 
   let displayed = tab === 'mine' ? circles.filter((c) => myCircles.includes(c.id)) : circles;
   if (search.trim()) displayed = displayed.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
 
+  const [showPrivateModal, setShowPrivateModal] = useState(false);
+  const [joinId, setJoinId] = useState('');
+  const [joinError, setJoinError] = useState('');
+  const [createName, setCreateName] = useState('');
+  const [createDesc, setCreateDesc] = useState('');
+  const [creating, setCreating] = useState(false);
+
+  const handleJoinPrivate = async () => {
+    if (!joinId.trim()) return;
+    const { data, error } = await supabase.from('circles').select('id').eq('id', joinId.trim()).single();
+    if (error || !data) { setJoinError('Circle not found or invalid ID.'); return; }
+    navigate(`/circles/${data.id}`);
+  };
+
+  const handleCreatePrivate = async () => {
+    if (!createName.trim()) return;
+    setCreating(true);
+    const { data, error } = await supabase.from('circles').insert({
+      name: createName.trim(), description: createDesc.trim(), is_private: true, created_by: user.id
+    }).select().single();
+    if (!error && data) {
+      navigate(`/circles/${data.id}`);
+    }
+    setCreating(false);
+  };
+
   return (
     <div className="page-content fade-in">
-      <div className="page-header">
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Circles</h2>
           <p className="page-header-sub">Safe spaces organized by what you're going through</p>
         </div>
+        <button className="btn btn-secondary btn-sm" onClick={() => setShowPrivateModal(true)}>
+          Private Circle
+        </button>
       </div>
 
       <div className="circles-toolbar">
@@ -79,7 +105,7 @@ export default function CirclesPage() {
             const count = c.circle_members?.[0]?.count || 0;
 
             return (
-              <button key={c.id} className="circle-row card card-hover" onClick={() => joinCircle(c.id)}>
+              <button key={c.id} className="circle-row card card-hover" onClick={() => goToCircle(c.id)}>
                 <div className="circle-row-icon" style={{ background: (s.color || 'var(--primary)') + '18', color: s.color || 'var(--primary)' }}>
                   {s.icon ? <Icon name={s.icon} size={20} /> : <Users size={20} />}
                 </div>
@@ -101,6 +127,42 @@ export default function CirclesPage() {
               </button>
             );
           })}
+        </div>
+      )}
+
+      {/* Private Circle Modal */}
+      {showPrivateModal && (
+        <div className="modal-overlay" onClick={() => setShowPrivateModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <button className="btn-ghost" onClick={() => setShowPrivateModal(false)}>Cancel</button>
+              <h3>Private Circles</h3>
+              <div style={{ width: 40 }} />
+            </div>
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              
+              <div className="card-glass" style={{ padding: '16px' }}>
+                <h4 style={{ marginBottom: '8px', fontSize: '1rem' }}>Join Private Circle</h4>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>Enter the unique ID shared by the creator.</p>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input className="input" style={{ flex: 1 }} placeholder="Paste ID here" value={joinId} onChange={e => {setJoinId(e.target.value); setJoinError('')}} />
+                  <button className="btn btn-primary" onClick={handleJoinPrivate}>Join</button>
+                </div>
+                {joinError && <div style={{ color: 'var(--danger)', fontSize: '0.75rem', marginTop: '8px' }}>{joinError}</div>}
+              </div>
+
+              <div className="card-glass" style={{ padding: '16px' }}>
+                <h4 style={{ marginBottom: '8px', fontSize: '1rem' }}>Create Private Circle</h4>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>Create an unlisted circle only accessible via link/ID.</p>
+                <input className="input" style={{ marginBottom: '12px', width: '100%' }} placeholder="Circle Name" value={createName} onChange={e => setCreateName(e.target.value)} />
+                <textarea className="input" style={{ minHeight: '60px', width: '100%', marginBottom: '12px' }} placeholder="Description (Optional)" value={createDesc} onChange={e => setCreateDesc(e.target.value)} />
+                <button className="btn btn-secondary" style={{ width: '100%' }} disabled={!createName.trim() || creating} onClick={handleCreatePrivate}>
+                  {creating ? 'Creating...' : 'Create & Get ID'}
+                </button>
+              </div>
+
+            </div>
+          </div>
         </div>
       )}
     </div>
