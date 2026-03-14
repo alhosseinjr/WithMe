@@ -87,6 +87,15 @@ create table if not exists vent_reactions (
   unique(vent_id, user_id, reaction_type)
 );
 
+-- AI Companion Conversations
+create table if not exists ai_messages (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id),
+  role text not null check (role in ('user', 'assistant')),
+  content text not null,
+  created_at timestamptz default now()
+);
+
 -- ============================================
 -- Row Level Security
 -- ============================================
@@ -98,6 +107,7 @@ alter table post_reactions enable row level security;
 alter table check_ins enable row level security;
 alter table vents enable row level security;
 alter table vent_reactions enable row level security;
+alter table ai_messages enable row level security;
 
 -- Public read policies
 create policy "Public read circles" on circles for select using (true);
@@ -122,6 +132,7 @@ create policy "React to posts" on post_reactions for all using (auth.uid() = use
 create policy "Check in" on check_ins for all using (auth.uid() = user_id);
 create policy "Create vent" on vents for insert with check (auth.uid() = user_id);
 create policy "React to vents" on vent_reactions for all using (auth.uid() = user_id);
+create policy "Manage own AI messages" on ai_messages for all using (auth.uid() = user_id);
 
 -- Auto-create profile on signup
 create or replace function public.handle_new_user()

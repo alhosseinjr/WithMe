@@ -3,15 +3,38 @@ import { Sparkles, Send, ShieldAlert, ArrowLeft } from 'lucide-react';
 import { chatWithCompanion } from '../lib/groq';
 import './CompanionPage.css';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 
 export default function CompanionPage() {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hi there. I'm here to listen. Whatever is on your mind, you can share it with me safely here. It's completely private." }
-  ]);
+  const { user } = useAuth();
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const { data, error } = await supabase
+        .from('ai_messages')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setMessages(data.map(m => ({ role: m.role, content: m.content })));
+      } else {
+        setMessages([
+          { role: 'assistant', content: "Hi there. I'm here to listen. Whatever is on your mind, you can share it with me safely here. It's completely private." }
+        ]);
+      }
+      setFetching(false);
+    };
+
+    fetchHistory();
+  }, [user.id]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -28,9 +51,24 @@ export default function CompanionPage() {
     setInput('');
     setLoading(true);
 
+    // Save user message to DB
+    await supabase.from('ai_messages').insert({
+      user_id: user.id,
+      role: 'user',
+      content: userMsg.content
+    });
+
     const reply = await chatWithCompanion(newHistory);
+    const assistantMsg = { role: 'assistant', content: reply };
     
-    setMessages([...newHistory, { role: 'assistant', content: reply }]);
+    // Save assistant message to DB
+    await supabase.from('ai_messages').insert({
+      user_id: user.id,
+      role: 'assistant',
+      content: assistantMsg.content
+    });
+
+    setMessages([...newHistory, assistantMsg]);
     setLoading(false);
   };
 
@@ -55,7 +93,11 @@ export default function CompanionPage() {
       </div>
 
       <div className="cp-chat">
-        {messages.map((m, i) => (
+        {fetching ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+            <div className="spinner" style={{ color: 'var(--primary)' }} />
+          </div>
+        ) : messages.map((m, i) => (
           <div key={i} className={`cp-msg-row ${m.role === 'user' ? 'cp-msg-right' : 'cp-msg-left'}`}>
             {m.role === 'assistant' && (
               <div className="avatar avatar-sm cp-avatar" style={{ background: 'var(--primary)', color: '#fff' }}>
