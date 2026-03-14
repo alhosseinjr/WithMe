@@ -24,6 +24,10 @@ create table if not exists circles (
   created_at timestamptz default now()
 );
 
+-- Safely add columns if table already existed previously
+alter table circles add column if not exists is_private boolean default false;
+alter table circles add column if not exists created_by uuid references profiles(id);
+
 -- Circle memberships
 create table if not exists circle_members (
   id uuid primary key default gen_random_uuid(),
