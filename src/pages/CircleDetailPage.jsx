@@ -45,11 +45,11 @@ export default function CircleDetailPage() {
   const fetchData = useCallback(async () => {
     const [{ data: circleData }, { data: memberData }, { data: postsData }] = await Promise.all([
       supabase.from('circles').select('*').eq('id', circleId).single(),
-      supabase.from('circle_members').select('id').eq('circle_id', circleId).eq('user_id', user.id).maybeSingle(),
+      supabase.from('circle_members').select('id').eq('circle_id', circleId).eq('user_id', user.id).limit(1),
       supabase.from('posts').select('*, post_reactions(reaction_type, user_id)').eq('circle_id', circleId).order('created_at', { ascending: true }),
     ]);
     setCircle(circleData);
-    setIsMember(!!memberData);
+    setIsMember(memberData && memberData.length > 0);
     setPosts(postsData || []);
     setLoading(false);
   }, [circleId, user]);
@@ -85,6 +85,8 @@ export default function CircleDetailPage() {
   }, [circleId, fetchData, user.id, profile]);
 
   const handleJoin = async () => {
+    if (isMember) return;
+    setIsMember(true);
     await supabase.from('circle_members').insert({ circle_id: circleId, user_id: user.id });
     fetchData();
   };
