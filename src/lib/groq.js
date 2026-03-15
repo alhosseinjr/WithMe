@@ -1,10 +1,19 @@
 import Groq from 'groq-sdk';
 
-// Initialize Groq client using the API key from environment variables
-const groq = new Groq({
-  apiKey: import.meta.env.VITE_GROQ_API_KEY,
-  dangerouslyAllowBrowser: true // Required for client-side API calls in Vite
-});
+let groqInstance = null;
+const getGroq = () => {
+  if (!import.meta.env.VITE_GROQ_API_KEY) {
+    console.warn('VITE_GROQ_API_KEY is not set. Groq features will be disabled.');
+    return null;
+  }
+  if (!groqInstance) {
+    groqInstance = new Groq({
+      apiKey: import.meta.env.VITE_GROQ_API_KEY,
+      dangerouslyAllowBrowser: true
+    });
+  }
+  return groqInstance;
+};
 
 const MODEL = 'llama-3.3-70b-versatile'; // Fast, highly capable open-source model
 
@@ -13,6 +22,8 @@ const MODEL = 'llama-3.3-70b-versatile'; // Fast, highly capable open-source mod
  * @param {Array} messages - Array of {role, content} objects representing the conversation history
  */
 export async function chatWithCompanion(messages) {
+  const groq = getGroq();
+  if (!groq) return "I'm sorry, my AI features aren't configured right now.";
   try {
     const response = await groq.chat.completions.create({
       messages: [
@@ -45,6 +56,8 @@ Rules:
  * @param {Array} recentCheckins - Array of recent check-in objects from Supabase
  */
 export async function generateDailyInsight(recentCheckins) {
+  const groq = getGroq();
+  if (!groq) return null;
   if (!recentCheckins || recentCheckins.length === 0) return null;
 
   try {
@@ -85,6 +98,8 @@ Rules:
  * @param {string} ventContent - The text of the anonymous vent
  */
 export async function generateEmpathyReply(ventContent) {
+  const groq = getGroq();
+  if (!groq) return null;
   try {
     const response = await groq.chat.completions.create({
       messages: [
