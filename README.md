@@ -20,7 +20,7 @@ WithMe is a premium, high-fidelity web application designed to help people conne
 
 By stripping away the performance-based nature of traditional social media, WithMe provides a sanctuary for pure empathy. Featuring a sophisticated forest glassmorphism design, real-time presence tracking, and uncompromising anonymity, it sets a new standard for safe human connection.
 
-**Live Deployment:** [with-me-app.vercel.app](https://with-me-app.vercel.app/)
+**Live Deployment:** [with-me-app.vercel.app](https://with-me-alpha.vercel.app/)
 
 ---
 
