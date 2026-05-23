@@ -4,7 +4,7 @@
   <p><strong>A secure, anonymous peer-support ecosystem for navigated shared life struggles.</strong></p>
   
   <p>
-    <a href="https://with-me-app.vercel.app/"><strong>Live Demo</strong></a> •
+    <a href="https://with-me-alpha.vercel.app/"><strong>Live Demo</strong></a> •
     <a href="#core-philosophy">Philosophy</a> •
     <a href="#features">Features</a> •
     <a href="#tech-stack">Tech Stack</a> •
